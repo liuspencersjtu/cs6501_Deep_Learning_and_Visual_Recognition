@@ -18,9 +18,8 @@ public class getPicture {
 
     @Before
     public void setUp(){
-        System.setProperty("webdriver.chrome.driver","/Users/rouman/Documents/GitHub/getPicture/bin/chromedriver");
+        System.setProperty("webdriver.chrome.driver","/Users/rouman/Documents/GitHub/cs6501_Deep_Learning_and_Visual_Recognition/getPicture/bin/chromedriver");
         driver = new ChromeDriver();
-        driver.get(url);
     }
 
     @After
@@ -30,52 +29,43 @@ public class getPicture {
 
     @Test
     public void getPic(){
-        //assertEquals(driver.getTitle(),"hi");
-        try{TimeUnit.SECONDS.sleep(5);}
-        catch (Exception e){}
-        for(int i = 0;i < 2000;i++) {
-            driver.findElement(By.xpath("//button[@class='btn btn-primary ']")).click();
-            try{
-                TimeUnit.SECONDS.sleep(2);
+        int i = 900;
+        String last = "";
+        while(i<2000) {
+            driver = new ChromeDriver();
+            driver.get(url);
+            try {
+                TimeUnit.SECONDS.sleep(5);
+            } catch (Exception e) {
             }
-            catch (Exception e){}
-            String ret = driver.findElement(By.xpath("//img[@alt='result']")).getAttribute("src");
-            ret = ret.split(",")[1];
-            //System.out.println(ret);
-            if (ret != null){
-                BASE64Decoder decoder = new BASE64Decoder();
-                String imgFilePath = "./output/"+(i+1)+".png";//新生成的图片
+            while (true) {
+                driver.findElement(By.xpath("//button[@class='btn btn-primary ']")).click();
                 try {
-                    byte[] b = decoder.decodeBuffer(ret);
-                    OutputStream out = new FileOutputStream(imgFilePath);
-                    out.write(b);
-                    out.flush();
-                    out.close();
+                    TimeUnit.SECONDS.sleep(2);
+                } catch (Exception e) {
                 }
-                catch (Exception e){
+                String ret = driver.findElement(By.xpath("//img[@alt='result']")).getAttribute("src");
+                ret = ret.split(",")[1];
+                if (ret != null && !ret.equals(last)) {
+                    last = ret;
+                    BASE64Decoder decoder = new BASE64Decoder();
+                    String imgFilePath = "./output/" + (i + 1) + ".png";//新生成的图片
+                    i++;
+                    try {
+                        byte[] b = decoder.decodeBuffer(ret);
+                        OutputStream out = new FileOutputStream(imgFilePath);
+                        out.write(b);
+                        out.flush();
+                        out.close();
+                    } catch (Exception e) {
 
+                    }
+                }
+                if(i%100==99){
+                    break;
                 }
             }
-//            try
-//            {
-//                //Base64解码
-//                byte[] b = decoder.decodeBuffer(imgStr);
-//                for(int i=0;i<b.length;++i)
-//                {
-//                    if(b[i]<0)
-//                    {//调整异常数据
-//                        b[i]+=256;
-//                    }
-//                }
-//                //生成jpeg图片
-//               
-//               
-//                return true;
-//            }
-//            catch (Exception e)
-//            {
-//               return false;
-//            }
+            driver.quit();
         }
     }
 }
